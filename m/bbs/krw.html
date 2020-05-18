@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title></title>
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0" /> 
+  <link rel="stylesheet" media="all" href="style.css" type="text/css">
+  
+ <script src="js/jquery.min.js"></script>
+ 
+ </head>
+ <body>
+ </body>
+ 
+ <script>
+$(function() {
+$.ajax({
+    cache: false,
+    url: "api_stock.php",
+    dataType: "json",
+    success: function(result) {
+		 var testList = new Array() ;
+        $.each(result, function(i, field){
+			//$("#content").html(i);
+			 //
+			 if (i == "usdkrw"){
+				$.each(field, function(j, f){
+					//if ( j.split(".",1) <= end && j.split(".",1) >= start) {
+					
+					var data = new Object() ;
+             
+					data.date = j;
+					data.price = f;
+             
+					testList.push(data);
+					//$("#content").html();
+
+					//}
+				});
+				
+			
+			 }
+			
+        });
+			testList.reverse();
+			
+			alert(testList[0].price);
+			//	 var jsonInfo = JSON.stringify(testList) ;
+
+		
+	
+		//	$("#content").html(jsonInfo);
+	}
+    });
+
+});
+</script>
+ </html>

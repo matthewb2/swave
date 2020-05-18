@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <title>과학전문검색 에스웨이브</title>
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0" /> 
+  <link rel="stylesheet" media="all" href="style.css" type="text/css">
+  <link rel="icon" href="images/EeO_icon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" href="css/style.min.css"> 
+  <script type="text/javascript" src="codebird.js"></script>
+ <script src="js/jquery.min.js"></script>
+ 
+ <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+				
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  
+</script>
+
+
+
+</head>
+
+<body>
+	<div id="content"></div>
+	<div>예제
+	
+	<pre style="background:#fff;color:#3b3b3b"><span style="color:#7a7a7a">&lt;!<span style="color:#7a7a7a"><span style="color:#016cff">DOCTYPE</span> html</span>></span>
+<span style="color:#7a7a7a">&lt;<span style="color:#016cff">head</span>></span>
+  <span style="color:#7a7a7a">&lt;<span style="color:#016cff">meta</span> <span style="color:#963dff">charset</span>=<span style="color:#666">"utf-8"</span> /></span>
+  <span style="color:#7a7a7a">&lt;<span style="color:#016cff">link</span> <span style="color:#963dff">rel</span>=<span style="color:#666">"icon"</span> <span style="color:#963dff">href</span>=<span style="color:#666">"favicon.ico"</span> <span style="color:#963dff">type</span>=<span style="color:#666">"image/x-icon"</span>></span>
+  <span style="color:#7a7a7a">&lt;<span style="color:#016cff">title</span>>&lt;/<span style="color:#016cff">title</span>></span>
+  <span style="color:#7a7a7a">&lt;<span style="color:#016cff">meta</span> <span style="color:#963dff">name</span>=<span style="color:#666">"viewport"</span> <span style="color:#963dff">content</span>=<span style="color:#666">"width=device-width; initial-scale=1.0; maximum-scale=1.0"</span> /></span> 
+  <span style="color:#7a7a7a">&lt;<span style="color:#016cff">link</span> <span style="color:#963dff">rel</span>=<span style="color:#666">"stylesheet"</span> <span style="color:#963dff">media</span>=<span style="color:#666">"all"</span> <span style="color:#963dff">href</span>=<span style="color:#666">"style.css"</span> <span style="color:#963dff">type</span>=<span style="color:#666">"text/css"</span>></span>
+  
+ &lt;<span style="color:#016cff">script</span> <span style="color:#963dff">src</span>=<span style="color:#666">"js/jquery.min.js"</span>>&lt;/<span style="color:#016cff">script</span>>
+ 
+ <span style="color:#7a7a7a">&lt;/<span style="color:#016cff">head</span>></span>
+ <span style="color:#7a7a7a">&lt;<span style="color:#016cff">body</span>></span>
+ <span style="color:#7a7a7a">&lt;/<span style="color:#016cff">body</span>></span>
+ 
+ &lt;<span style="color:#016cff">script</span>>
+<span style="color:#069;font-weight:700">$</span>(<span style="color:#ff5600">function</span>() {
+<span style="color:#069;font-weight:700">$</span>.ajax({
+    cache: <span style="color:#a535ae">false</span>,
+    url: <span style="color:#666">"api_stock.php"</span>,
+    dataType: <span style="color:#666">"json"</span>,
+    <span style="color:#21439c">success</span>: <span style="color:#ff5600">function</span>(result) {
+         <span style="color:#ff5600">var</span> testList <span style="color:#069;font-weight:700">=</span> <span style="color:#069;font-weight:700">new</span> <span style="color:#21439c">Array</span>() ;
+        <span style="color:#069;font-weight:700">$</span>.each(result, <span style="color:#ff5600">function</span>(i, field){
+            <span style="color:#af82d4">//$("#content").html(i);</span>
+             <span style="color:#af82d4">//</span>
+             <span style="color:#069;font-weight:700">if</span> (i <span style="color:#069;font-weight:700">==</span> <span style="color:#666">"usdkrw"</span>){
+                <span style="color:#069;font-weight:700">$</span>.each(field, <span style="color:#ff5600">function</span>(j, f){
+                    <span style="color:#af82d4">//if ( j.split(".",1) &lt;= end &amp;&amp; j.split(".",1) >= start) {</span>
+                    
+                    <span style="color:#ff5600">var</span> data <span style="color:#069;font-weight:700">=</span> <span style="color:#069;font-weight:700">new</span> <span style="color:#21439c">Object</span>() ;
+             
+                    data.date <span style="color:#069;font-weight:700">=</span> j;
+                    data.price <span style="color:#069;font-weight:700">=</span> f;
+             
+                    testList.<span style="color:#45ae34;font-weight:700">push</span>(data);
+                    <span style="color:#af82d4">//$("#content").html();</span>
+
+                    <span style="color:#af82d4">//}</span>
+                });
+                
+            
+             }
+            
+        });
+            testList.<span style="color:#45ae34;font-weight:700">reverse</span>();
+            
+            <span style="color:#45ae34;font-weight:700">alert</span>(testList[<span style="color:#a8017e">0</span>].price);
+            <span style="color:#af82d4">//   var jsonInfo = JSON.stringify(testList) ;</span>
+
+        
+    
+        <span style="color:#af82d4">//  $("#content").html(jsonInfo);</span>
+    }
+    });
+
+});
+&lt;/<span style="color:#016cff">script</span>>
+ <span style="color:#7a7a7a">&lt;/<span style="color:#016cff">html</span>></span>
+</pre>
+	
+	</div>
+		
+</body>
+
+<script>
+$(document).ready(function(){
+
+var url = new URL(window.location.href);
+var stock2 = url.searchParams.get("stock");
+//alert(stock2);
+
+	$.ajax({
+    cache: false,
+    url: "newsdata.php",
+    dataType: "json",
+    success: function(result) {
+		 var testList = new Array() ;
+        $.each(result, function(i, field){
+			//$("#content").html(i);
+			 //
+			 if (i == stock2){
+				$.each(field, function(j, f){
+					//if ( j.split(".",1) <= end && j.split(".",1) >= start) {
+					
+					var data = new Object() ;
+             
+					data.date = j;
+					data.price = f;
+             
+					testList.push(data);
+					//$("#content").html();
+
+					//}
+				});
+				
+			
+			 }
+			
+        });
+			//alert("ddd");
+				 var jsonInfo = JSON.stringify(testList) ;
+
+		
+	
+			$("#content").html(jsonInfo);
+	}
+    });
+	
+});
+</script>
+</html>

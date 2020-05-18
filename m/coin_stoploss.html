@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=euc-kr" />
+        <style>
+            table {border-collapse: collapse}
+            td, th {padding:5px; width:120px;
+						font-famility:돋움; font-size:13pt;
+						font-weight:bold
+			
+			}
+			.stybch {color:#666666}
+			.stybct {color:red}
+			.styeth {color:blue}
+			.styetc {color:green}
+        </style>
+        <script src="https://code.jquery.com/jquery-1.4.4.min.js"></script>
+        <script>
+            
+            
+            // 천단위 콤마 함수
+            function numberWithCommas(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            // 숫자 외 문자열 제거 함수
+            function numberDeleteChar(x) {
+                return x.toString().replace(/[^0-9]+/g, '');
+            }
+            
+            // 달러 환율 함수 (ajax 동기식) <현재 URL이 막혀 밑의 함수로 대체합니다.>
+            function usdkrw(){
+                usd = 1093;
+				$('#USDKRW').val(usd);
+            }
+
+            
+			
+            
+            
+            // 코인원 함수
+            function coinone(){
+                $.get('https://api.coinone.co.kr/ticker?currency=all', function(data) {
+                    coinone_btc = parseFloat(data['btc']['last']);
+                    var coinone_eth = parseFloat(data['eth']['last']);
+					var coinone_etc = parseFloat(data['etc']['last']);
+                    var coinone_bch = parseFloat(data['bch']['last']);
+					//var coinone_btg = parseFloat(data['btg']['last']);
+                    $('#coinone_BTC').html('\\ ' + numberWithCommas(coinone_btc)); // 거래소 시세 정보 표에 값 세팅
+                    $('#coinone_ETH').html('\\ ' + numberWithCommas(coinone_eth));
+					$('#coinone_ETC').html('\\ ' + numberWithCommas(coinone_etc));
+                    $('#coinone_BCH').html('\\ ' + numberWithCommas(coinone_bch));
+					//$('#coinone_BTG').html('\\ ' + numberWithCommas(coinone_btg));
+                });
+				
+            }
+            
+            // 빗썸 함수 (크로스도메인 문제로 익스에서만 됨)
+            function bithumb(){
+                $.get('https://api.bithumb.com/public/ticker/ALL', function(data) {
+                    var bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
+                    var bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
+					var bithumb_etc = parseFloat(data['data']['ETC']['closing_price']);
+                    var bithumb_bch = parseFloat(data['data']['BCH']['closing_price']);
+					var bithumb_btg = parseFloat(data['data']['BTG']['closing_price']);
+                    $('#bithumb_BTC').html('\\' + numberWithCommas(bithumb_btc)); // 거래소 시세 정보 표에 값 세팅
+                    $('#bithumb_ETH').html('\\ ' + numberWithCommas(bithumb_eth));
+					$('#bithumb_ETC').html('\\ ' + numberWithCommas(bithumb_etc));
+                    $('#bithumb_BCH').html('\\ ' + numberWithCommas(bithumb_bch));
+					$('#bithumb_BTG').html('\\ ' + numberWithCommas(bithumb_btg));
+					
+					//	$('#get_price').val(bithumb_btc);
+                });
+			
+            }
+            
+			function price_bithumb(){
+			var bithumb_btc;
+                $.get('https://api.bithumb.com/public/ticker/ALL', function(data) {
+                    bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
+                    var bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
+					var bithumb_etc = parseFloat(data['data']['ETC']['closing_price']);
+                    var bithumb_bch = parseFloat(data['data']['BCH']['closing_price']);
+					var bithumb_btg = parseFloat(data['data']['BTG']['closing_price']);
+            			//$('#get_price').val(bithumb_btc);
+                });
+				return bithumb_btc;
+            }
+            // 코빗 함수 (크로스도메인 문제로 익스에서만 됨)
+            function korbit(){
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=btc_krw', function(data) {
+                    //data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_btc = parseFloat(data['last']);
+                    $('#korbit_BTC').html('\\ ' + numberWithCommas(korbit_btc));
+                });
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=eth_krw', function(data) {
+                    //data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_eth = parseFloat(data['last']);
+                    $('#korbit_ETH').html('\\ ' + numberWithCommas(korbit_eth));
+                });
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=bch_krw', function(data) {
+                    //data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_bch = parseFloat(data['last']);
+                    $('#korbit_BCH').html('\\ ' + numberWithCommas(korbit_bch));
+                });
+            }
+            
+            // 알람 세팅 함수
+            function alert_setting() {
+                var selectTrade = $("#targetTrade option:selected").val(); // 선택된 거래소
+                var selectAmount = numberDeleteChar($("#targetAmount").val()); // 선택된 시세
+                var targetIf = $("#targetIf option:selected").val(); // 이상/이하
+                var tmp_array = new Array(selectTrade, selectAmount, targetIf); // 세팅 값 3개를 묶음
+                alert_array.push(tmp_array); // 세팅 값 저장
+                if(targetIf == '0')
+                    var targetIfPrint = "<font color='blue'>이하</font>";
+                else if(targetIf == '1')
+                    var targetIfPrint = "<font color='red'>이상</font>";
+                $("#alert_list").append("<li><b>"+selectTrade+"</b> 거래소의 시세가 <b>"+numberWithCommas(selectAmount)+"</b> 원 "+targetIfPrint+" 일 때 알람</li>")
+            }
+			
+		
+			
+            
+            // 알람 실행 함수
+            function alert_start() {
+                // 알람 배열 크기만큼 순회
+                for(var i=0; i < alert_array.length; i++) {
+                    if(typeof alert_array[i]=='undefined') continue; // 지워진 알람이면 건너뛰기
+                    var selectTrade = alert_array[i][0];
+                    var selectAmount = alert_array[i][1];
+                    var targetIf = alert_array[i][2];
+                    var currentAmount = numberDeleteChar($('#'+selectTrade).html()); // 선택된 거래소의 현재 시세
+                    var d = new Date();
+                    
+                    if(targetIf == '0' && parseFloat(currentAmount) <= parseFloat(selectAmount)) { // 선택된 거래소의 현재 시세가 설정 값보다 이하일때
+                        alert(selectTrade + " 거래소의 시세가 " + selectAmount + "원 이하(" + currentAmount + ")입니다.\n" + d.toString());
+                        delete(alert_array[i]); // 알람 세팅 값 삭제
+                    } else if(targetIf == '1' && parseFloat(currentAmount) >= parseFloat(selectAmount)) { // 선택된 거래소의 현재 시세가 설정 값보다 이상일때
+                        alert(selectTrade + " 거래소의 시세가 " + selectAmount + "원 이상(" + currentAmount + ")입니다.\n" + d.toString());
+                        delete(alert_array[i]); // 알람 세팅 값 삭제
+                    }
+                }
+                
+                // 알람목록 갱신
+                $("#alert_list").empty();
+                for(var i=0; i < alert_array.length; i++) {
+                    if(typeof alert_array[i]=='undefined') continue; // 지워진 알람이면 건너뛰기
+                    var selectTrade = alert_array[i][0];
+                    var selectAmount = alert_array[i][1];
+                    var targetIf = alert_array[i][2];
+                    if(targetIf == '0') var targetIfPrint = "<font color='blue'>이하</font>";
+                    else if(targetIf == '1') var targetIfPrint = "<font color='red'>이상</font>";
+                    $("#alert_list").append("<li><b>"+selectTrade+"</b> 거래소의 시세가 <b>"+numberWithCommas(selectAmount)+"</b> 원 "+targetIfPrint+" 일 때 알람</li>")
+                }
+                
+            }
+            
+
+            // 현재 시간 갱신
+            function CurrentTime() {
+                var d = new Date();
+                $("#lastUpdate").html(d.toString());
+            }
+            
+            
+            function proc() {
+						//	alert("ddd");
+               
+                    coinone(); // 코인원
+                    bithumb(); // 빗썸
+                    
+					
+                    //alert_start(); // 알람 확인
+                    CurrentTime(); // 갱신 시간
+					
+					
+					
+					 setTimeout("proc()", 5000); //5초후 재시작
+									
+				
+            }
+			
+			
+			function alert_running() {
+			 $("#modeonoff").html("<span style='font-color:#red'>알람이 실행 중입니다</span>");
+			
+			
+                try {
+                    //usdkrw(); // 환율
+						// poloniex(); // 폴로닉스
+                    coinone(); // 코인원
+                    bithumb(); // 빗썸
+                    korbit(); // 코빗
+                    //alert_start(); // 알람 확인
+                    CurrentTime(); // 갱신 시간
+					//window.open("exchange_sound.html", "MsgWindow", "width=200,height=100");
+					
+					
+					
+					var buyprice = $("#get_price").val();
+						
+					var mincoin;
+					
+					var bithumb_btc;
+                $.get('https://api.bithumb.com/public/ticker/ALL', function(data) {
+                    bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
+                    var bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
+					var bithumb_etc = parseFloat(data['data']['ETC']['closing_price']);
+                    var bithumb_bch = parseFloat(data['data']['BCH']['closing_price']);
+					var bithumb_btg = parseFloat(data['data']['BTG']['closing_price']);
+            		if ( bithumb_btc < buyprice - 500000 ) {
+						
+										
+							window.open("stoploss_sound.html", "MsgWindow", 
+							"width=300,height=250");
+						
+					} else { 
+						if ( bithumb_btc > buyprice ) {
+							$("#return_rate").html("<span style='font-weight:bold; color:red'> ▲ "+numberWithCommas(bithumb_btc-buyprice)+" 상승</span>");
+							} else $("#return_rate").html("<span style='font-weight:bold; color:blue'> ▼ "+numberWithCommas(buyprice-bithumb_btc)+" 하락");
+					}
+					
+                });
+				
+					//alert(bithumb_btc);
+					
+					
+					
+					
+					
+					
+                } catch(e){ //시세 불러오기를 실패했을 때 처리
+				
+					
+                    
+                } finally {
+                    setTimeout("alert_running()", 5000); //5초후 재시작
+                }
+            }
+        </script>
+		
+    </head>
+    <body>
+	
+        <!-- 거래소 시세 정보 -->
+        <table border=1>
+            <tr>
+                <th></th>
+					<th>폴로닉스 국제시세</th>
+                <th>코인원</th>
+                <th>빗썸</th>
+                <th>코빗</th>
+            </tr>
+			
+            <tr>
+                <td class="stybct">비트코인</td>
+				<td class="stybct" id="poloniex_BTC"></td>
+				<td class="stybct" id="coinone_BTC"></td>
+                <td class="stybct" id="bithumb_BTC"></td>
+                <td class="stybct" id="korbit_BTC"></td>
+            </tr>
+             <tr>
+                
+				<td class="stybch">비트코인캐시</td>
+                <td class="stybch" id="poloniex_BCH"></td>
+				
+				<td class="stybch" id="coinone_BCH"></td>
+                <td class="stybch" id="bithumb_BCH"></td>
+                <td class="stybch" id="korbit_BCH"></td>
+            </tr>
+			<tr>
+                <td class="styeth">이더리움</td>
+				<td class="styeth" id="poloniex_ETH"></td>
+				
+                <td class="styeth" id="coinone_ETH"></td>
+                <td class="styeth" id="bithumb_ETH"></td>
+                <td class="styeth" id="korbit_ETH"></td>
+            </tr>
+			<tr>
+                <td class="styetc">이더리움클래식</td>
+				<td class="styetc" id="poloniex_ETC"></td>
+				
+                <td class="styetc" id="coinone_ETC"></td>
+                <td class="styetc" id="bithumb_ETC"></td>
+                <td class="styetc" id="korbit_ETC"></td>
+            </tr>
+           
+			
+            <tr>
+                <td>최근 갱신 시간</td>
+                <td colspan="4" id="lastUpdate"></td>
+            </tr>
+			<tr>
+                <td>스탑로스</td>
+                <td colspan="4" id="modeonoff"></td>
+            </tr>
+		
+        </table>
+        
+        <!-- 작대기 구분 -->
+        <hr>
+        
+        <!-- 알람 설정 -->
+		<table width="100%" border="1">
+		<tr><td rowspan="3">
+		비트코인(BTC)<span id="return_rate"></span>
+			</td>
+			<td>매수가 <input type="number" name="diff" id="get_price" step="500">
+
+		 </td>
+		<td width="100px"  rowspan="3">
+		<input id="targetSetting" type="button" value="설정" onClick="alert_running()">
+        </td>
+		</tr>
+		
+		<tr >
+		
+		<td>
+		매수금액 <input type="text" name="buy_account">
+		</td>
+		
+		</tr>
+		
+		<tr >
+		
+		<td>
+		<input type="number" id="diff" value="10" step="1" > % <input type="number" id="target_price" step="500">도달시 알림
+       
+		</td>
+		
+		</tr>
+		
+		</table>
+		
+	<iframe height="480" width="650" src="https://ssltvc.forexprostools.com/?pair_ID=940808&height=480&width=650&interval=300&plotStyle=candles&domain_ID=56&lang_ID=56&timezone_ID=26"></iframe>
+    
+	
+	<table width="100%" border="1">
+		<tr><td rowspan="3">
+		비트코인캐시(BCH)<span id="return_rate"></span>
+			</td>
+			<td>매수가 <input type="number" name="diff" id="get_price" step="500">
+
+		 </td>
+		<td width="100px"  rowspan="3">
+		<input id="targetSetting" type="button" value="설정" onClick="alert_running()">
+        </td>
+		</tr>
+		
+		<tr >
+		
+		<td>
+		매수금액 <input type="text" name="buy_account">
+		</td>
+		
+		</tr>
+		
+		<tr >
+		
+		<td>
+		<input type="number" id="diff" value="10" step="1" > % <input type="number" id="target_price" step="500">도달시 알림
+       
+		</td>
+		
+		</tr>
+		
+		</table>
+		
+	<iframe height="480" width="650" src="https://ssltvc.forexprostools.com/?pair_ID=1031396&height=480&width=650&interval=300&plotStyle=candles&domain_ID=56&lang_ID=56&timezone_ID=20"></iframe>
+	
+	
+	
+	</body>
+
+<script>
+$(document).ready(function(){
+
+			
+	
+                $.get('https://poloniex.com/public?command=returnTicker', function(data) {
+					var usdkrw = 1090;
+                    var poloniex_btc = parseFloat(data['USDT_BTC']['last']);
+					var poloniex_bch = parseFloat(data['USDT_BCH']['last']);
+                    var poloniex_eth = parseFloat(data['USDT_ETH']['last']);
+                    var poloniex_etc = parseFloat(data['USDT_ETC']['last']);
+                    $('#poloniex_BTC').html('$'+numberWithCommas(Math.round(poloniex_btc))+'<br>(\\'+numberWithCommas(Math.round(usdkrw*poloniex_btc))+')'); // 거래소 시세 정보 표에 값 세팅
+                    $('#poloniex_BCH').html('$'+numberWithCommas(Math.round(poloniex_bch))+'<br>(\\'+numberWithCommas(Math.round(usdkrw*poloniex_bch))+')'); // 거래소 시세 정보 표에 값 세팅
+                    $('#poloniex_ETH').html('$'+numberWithCommas(Math.round(poloniex_eth))+'<br>(\\'+numberWithCommas(Math.round(usdkrw*poloniex_eth))+')');
+                    $('#poloniex_ETC').html('$'+numberWithCommas(Math.round(poloniex_etc))+'<br>(\\'+numberWithCommas(Math.round(usdkrw*poloniex_etc))+')');
+                });
+           
+			
+ $.get('https://api.bithumb.com/public/ticker/ALL', function(data) {
+                    var bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
+                    var bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
+					var bithumb_etc = parseFloat(data['data']['ETC']['closing_price']);
+                    var bithumb_bch = parseFloat(data['data']['BCH']['closing_price']);
+					var bithumb_btg = parseFloat(data['data']['BTG']['closing_price']);
+                    $('#bithumb_BTC').html('\\' + numberWithCommas(bithumb_btc)); // 거래소 시세 정보 표에 값 세팅
+                    $('#bithumb_ETH').html('\\ ' + numberWithCommas(bithumb_eth));
+					$('#bithumb_ETC').html('\\ ' + numberWithCommas(bithumb_etc));
+                    $('#bithumb_BCH').html('\\ ' + numberWithCommas(bithumb_bch));
+					$('#bithumb_BTG').html('\\ ' + numberWithCommas(bithumb_btg));
+					
+						//$('#get_price').val(bithumb_btc);
+						//$('#target_price').val(bithumb_btc);
+						/*
+						var diff=$("#diff").val();
+			var change = oprice-oprice*diff*0.01;
+			
+			$("#target_price").val(change);
+						*/
+						
+                });
+				
+				 $.get('https://api.coinone.co.kr/ticker?currency=all', function(data) {
+                    coinone_btc = parseFloat(data['btc']['last']);
+                    var coinone_eth = parseFloat(data['eth']['last']);
+					var coinone_etc = parseFloat(data['etc']['last']);
+                    var coinone_bch = parseFloat(data['bch']['last']);
+					//var coinone_btg = parseFloat(data['btg']['last']);
+                    $('#coinone_BTC').html('\\ ' + numberWithCommas(coinone_btc)); // 거래소 시세 정보 표에 값 세팅
+                    $('#coinone_ETH').html('\\ ' + numberWithCommas(coinone_eth));
+					$('#coinone_ETC').html('\\ ' + numberWithCommas(coinone_etc));
+                    $('#coinone_BCH').html('\\ ' + numberWithCommas(coinone_bch));
+					//$('#coinone_BTG').html('\\ ' + numberWithCommas(coinone_btg));
+                });
+				
+				
+		proc();
+/*
+	var n = document.getElementById("diff");
+		var oprice=$("#get_price").val();
+		
+		
+		n.addEventListener("input", function(e) {
+			var diff=$("#diff").val();
+			var change = oprice-oprice*diff*0.01;
+			
+			$("#target_price").val(change);
+		}, false);
+	*/			
+});
+
+
+</script>
+</html>

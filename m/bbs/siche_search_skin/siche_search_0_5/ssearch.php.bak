@@ -1,0 +1,636 @@
+﻿<html>
+<head>
+ <meta charset='utf-8'>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="style.css">
+   
+   
+   
+<script src="jquery-1.11.3.min.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+function layerControl_over(){
+	var f1=document.getElementById("layer1").style;
+	var f2=document.getElementById("layer2").style;
+		f2.display='';
+		f1.display='none';
+
+}
+
+function layerControl_out(){
+	var f1=document.getElementById("layer1").style;
+	var f2=document.getElementById("layer2").style;
+		f2.display='none';
+		f1.display='';
+
+}
+</script>
+</head>
+<body>
+<?
+	$search = $_GET[search];
+//	echo $search;
+	
+// suggesting word implement
+	$f="./testdata.json";
+
+//	flie_get_content($f);
+
+$temp=array(array());
+	$contents = file_get_contents($f);
+//$contents = utf8_encode($contents);
+$temp = json_decode($contents); 
+
+	
+	
+	$reg_time = time();
+	//한글입력
+	//$search = iconv("euc-kr", "UTF-8", $search);
+	$new = array("time"=>time(), "term"=>$search);
+	//$new = array("time"=>time(), "term"=>"test");
+	
+	if ($temp){
+	array_unshift($temp, $new);
+	//echo "<script>alert('success');</script>";
+	//
+	}
+	if ($temp){
+		//echo "<script>alert('success');</script>";
+		if (json_encode($temp)){
+		file_put_contents($f, json_encode($temp));
+		//echo "<script>alert('success');</script>";
+		}
+		}
+//}
+	
+?>
+<? include "header.php";
+
+?>
+
+<?
+	$stime=(double)microtime()+time();
+	include "_head.php";
+
+	function error_MSG($error_MSG){
+		global $bgcolor;
+		unset($bgcolor);
+		echo "
+		<SCRIPT LANGUAGE=JavaScript>
+		alert ('$error_MSG');
+		history.go(-1);
+		</SCRIPT>
+		";
+
+		exit;
+	}
+	
+	$siche_license = siche_license();
+	$member = member_info();
+	if(!$sno){$sno = "1";}
+	$query = "select skinname, searchname, bbstitle, view_level, list_view_level, width, bgcolor, cut_length1, cut_length2, pagenum, pagegroupnum, targets, c_category, c_bbstitle, searchpoint1, searchpoint2, pagenumpoint1, pagenumpoint2, upfile, downfile, h_comment, f_comment from siche_search where sno = '$sno'";
+	$result = mysql_query($query);
+	if(!$result){
+		$errNO	= mysql_errno($connect);
+		$errMSG	= mysql_error($connect);
+		error_MSG("에러코드: $errNO<BR>$errMSG");
+	}
+	
+	$skinname			= @mysql_result($result,0,0) or error_MSG('잘못된 경로입니다.');
+	$searchname			= mysql_result($result,0,1);
+	$bbstitle			= mysql_result($result,0,2);
+	$view_level			= mysql_result($result,0,3);
+	$list_view_level	= mysql_result($result,0,4);
+	$width				= mysql_result($result,0,5);
+	$bgcolor			= mysql_result($result,0,6);
+	$cut_length1		= mysql_result($result,0,7);
+	$cut_length2		= mysql_result($result,0,8);
+	$pagenum			= mysql_result($result,0,9);
+	$pagegroupnum		= mysql_result($result,0,10);
+	$targets			= mysql_result($result,0,11);
+	$c_category			= mysql_result($result,0,12);
+	$c_bbstitle			= mysql_result($result,0,13);
+	$searchpoint1		= mysql_result($result,0,14);
+	$searchpoint2		= mysql_result($result,0,15);
+	$pagenumpoint1		= mysql_result($result,0,16);
+	$pagenumpoint2		= mysql_result($result,0,17);
+	$upfile				= mysql_result($result,0,18);
+	$downfile			= mysql_result($result,0,19);
+	$h_comment			= mysql_result($result,0,20);
+	$f_comment			= mysql_result($result,0,21);
+	
+	$h_comment			= stripslashes($h_comment);
+	$f_comment			= stripslashes($f_comment);
+	
+	$searchpoint1		= stripslashes($searchpoint1);
+	$searchpoint2		= stripslashes($searchpoint2);
+	$pagenumpoint1		= stripslashes($pagenumpoint1);
+	$pagenumpoint2		= stripslashes($pagenumpoint2);
+	
+	if($width <= 100) $width .= "%";
+	$searchname	= explode("/",$searchname);
+	$view_level	= explode("/",$view_level);
+	$bbstitle	= explode("/",$bbstitle);
+	
+	$searchname_count	= count($searchname);
+	$searchname_count	= $searchname_count - 1;
+	
+	for($a=0;$a<$searchname_count;$a++){
+		if($member[level] > $view_level[$a]){$view_level_check = "1";}else{$view_level_check = "0";}
+		if($view_level_check == "0"){$view_searchname .= $searchname[$a]."/";$view_bbstitle .= $bbstitle[$a]."/";}
+	}
+	
+	$searchname			= explode("/",$view_searchname);
+	$bbstitle_c			= explode("/",$view_bbstitle);
+
+	$searchname_count	= count($searchname);
+	$searchname_count	= $searchname_count - 1;
+	
+	$dir = "siche_search_skin/".$skinname."/";
+	if($member[no] ==1){
+		$admins = "<a href=\"sadmin.php\" target=\"blank\">";
+		$admine = "</a>";
+	} else {
+		$admins = "<!--";
+		$admine = "-->";
+	}
+
+	$t = 0;
+
+	$siche_search_ver = "Siche search v.0.5";
+	$copyright = "<a href=\"http://eos.pe.kr\" target=\"_blank\"><font size=1 face=tahoma>".$siche_search_ver."</font></a>";
+	$copyright .= " for <a href=\"http://nzeo.com\" target=\"_blank\"><font size=1 face=tahoma>Zerboard</font></a>";
+	$skinmaker = file("$dir/maker.txt");
+	$skinmaker = trim($skinmaker[0]);
+	//if(file_exists("$dir/maker.txt")){$copyright .= " / skin by $skinmaker";}
+
+	//echo "<body bgcolor=$bgcolor>";
+
+	function siche_license(){
+	$promise = "siche_search/promise.txt";
+	if(!file_exists("$promise")){break;}
+	echo "<!--";
+	include $promise;
+	echo "-->";
+	return $promise;
+	}
+
+	//보기 권한설정
+	if($member[level] > $list_view_level){$list_view_level_check = "1";}else{$list_view_level_check = "0";}
+
+	if($siche == "search" && $list_view_level_check == "0"){
+	if(!$sn && !$ss && !$sm && !$sc){
+	error_MSG("검색할 조건을 선택해주십시요.");
+	}
+	if(!$search){
+	error_MSG("검색할 단어를 써주십시요.");
+	}
+	$search			= trim($search);
+	$ssearch		= explode(" ",$search);
+	$search_count	= count($ssearch);
+
+	//정렬
+	if(!$page)
+	{$align_name = "";$align_date = "";$align_subject = "";
+	}else{
+	$align_name = "<a href='$PHP_SELF?sno=$sno&siche=search&page=$page&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=mt.name&align1=ASC&category=$category' class='align'>";
+	$align_date = "<a href='$PHP_SELF?sno=$sno&siche=search&page=$page&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=mt.no&align1=DESC&category=$category' class='align'>";
+	$align_subject = "<a href='$PHP_SELF?sno=$sno&siche=search&page=$page&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=mt.subject&align1=ASC&category=$category' class='align'>";
+	}
+
+	if(!$align){$align = "mt.no";$align1 = "DESC";}
+
+	if($upfile){include $upfile;}
+	if($h_comment){echo $h_comment;}
+	
+	
+	// echo "<link href=\"".$dir."style.css\" rel=\"stylesheet\" type=\"text/css\">";
+	echo "<div style='position:absolute; z-index:0; width:100%'>";
+	//include $dir."head.php";
+		
+	//카테고리
+	if($c_category == "1"){
+	if($category){
+	$searchname_count	= "1";
+	$n_searchname		= array_flip($searchname);
+	$t_su				= $n_searchname["$category"];
+	$t_su				= $bbstitle_c["$t_su"];
+	$bbstitle_c			= array($t_su);
+	$searchname			= array($category);
+	$category_total_s	= "<a href='$PHP_SELF?sno=$sno&siche=search&page=1&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1' class='category_title'>";
+	$category_total_e	= "</a>";
+	} else {
+	$searchname_count	= $searchname_count;
+	$searchname			= $searchname;
+	$category_total_s	= "<!--";
+	$category_total_e	= "-->";
+	}
+	
+
+	
+
+	if($page == 1){
+	for($a=0;$a<$searchname_count;$a++){
+		
+	if($sc == "1"){$c_fild = " ct.memo as cmemo, ct.name as cname, ct.reg_date as creg_date,";}
+	$siche_count = "select count(*) from zetyx_board_".$searchname[$a]." as mt";
+	if($sc == "1"){
+		$siche_count .= " LEFT JOIN zetyx_board_comment_".$searchname[$a]." as ct ON mt.no= ct.parent";
+	}
+	$siche_count .= " where (mt.is_secret != 1) and ";
+	if($search_count){
+	for($i=0;$i<$search_count;$i++){
+		if($ssearch[$i]){
+		$siche_count .= "(";
+		if($sn == 1) $siche_q[] = "mt.name like '%$ssearch[$i]%'";
+		if($ss == 1) $siche_q[] = "mt.subject like '%$ssearch[$i]%'";
+		if($sm == 1) $siche_q[] = "mt.memo like '%$ssearch[$i]%'";
+		if($sc == 1) $siche_q[] = "ct.memo like '%$ssearch[$i]%'";
+		$siche_count .= join(" or ", $siche_q);
+		unset ($siche_q);
+		$siche_count .= ")";
+		}
+		if($ssearch[$i+1]){
+		$siche_count .= " $oga ";
+		}
+	}
+	}
+
+	$query = mysql_fetch_array(mysql_query($siche_count,$connect));
+	$first = $query[0];
+	$view_category += $first;
+	$total_su .= $first."/";
+	}
+	$total_su		= explode("/",$total_su);
+	$total_su_count	= count($total_su);
+
+	for($a=0;$a<$total_su_count;$a++){
+	if($total_su[$a] == 0){$cut_title = $a;}
+	$bbstitle_c[$cut_title] = "";
+	}
+
+	if($view_category > 0){
+
+	include $dir."category_head.php";
+	for($a=0;$a<$searchname_count;$a++){
+	
+	if($bbstitle_c[$a] && $searchname[$a]){
+	$category_su = $total_su[$a];
+	$category_title = "<a href='$PHP_SELF?sno=$sno&siche=search&page=1&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=".$searchname[$a]."' class='category_title'>".$bbstitle_c[$a]."</a>";
+	include $dir."category_main.php";
+	}
+	}
+	include $dir."category_foot.php";
+	}
+	}
+	}
+	
+	//시작~	
+	for($a=0;$a<$searchname_count;$a++){
+	if($member[level] > $view_level[$a]){$view_level_check = "1";}else{$view_level_check = "0";}
+	//권한 설정
+	$searchname[$a];
+
+	if($sc == "1"){$c_fild = " ct.memo as cmemo, ct.name as cname, ct.reg_date as creg_date,";}
+		
+	$siche_query = "select mt.no, mt.name, mt.subject, mt.memo, mt.sitelink1, mt.sitelink2, mt.file_name1, mt.file_name2, mt.s_file_name1, mt.s_file_name2, mt.reg_date, mt.hit,".$c_fild." '".$searchname[$a]."' as id from zetyx_board_".$searchname[$a]." as mt";
+	$siche_count = "select count(*) from zetyx_board_".$searchname[$a]." as mt";
+	if($sc == "1"){
+		$siche_query .= " LEFT JOIN zetyx_board_comment_".$searchname[$a]." as ct ON mt.no= ct.parent";
+		$siche_count .= " LEFT JOIN zetyx_board_comment_".$searchname[$a]." as ct ON mt.no= ct.parent";
+	}
+	$siche_query .= " where (mt.is_secret != 1) and ";
+	$siche_count .= " where (mt.is_secret != 1) and ";
+	if($search_count){
+	for($i=0;$i<$search_count;$i++){
+		if($ssearch[$i]){
+		$siche_query .= "(";
+		$siche_count .= "(";
+		if($sn == 1) $siche_q[] = "mt.name like '%$ssearch[$i]%'";
+		if($ss == 1) $siche_q[] = "mt.subject like '%$ssearch[$i]%'";
+		if($sm == 1) $siche_q[] = "mt.memo like '%$ssearch[$i]%'";
+		if($sc == 1) $siche_q[] = "ct.memo like '%$ssearch[$i]%'";
+		$siche_query .= join(" or ", $siche_q);
+		$siche_count .= join(" or ", $siche_q);
+		unset ($siche_q);
+		$siche_query .= ")";
+		$siche_count .= ")";
+		}
+		if($ssearch[$i+1]){
+		$siche_query .= " $oga ";
+		$siche_count .= " $oga ";
+		}
+	}
+	}
+
+	//페이지 분할
+	$result =  mysql_query($siche_count,$connect) or die(mysql_error());
+	$query = mysql_fetch_array($result);
+	$first = $query[0];
+	$ttotal_su += $first;
+	$siche_total[] = $ttotal_su;
+	$total_su = $first;
+
+	// 첫페이지
+	if($page == 1){
+		
+	$start_num = 0;
+
+	if($ttotal_su <= $pagenum){
+	$end_num = $first;
+	} else {
+		$end_num =  $first - ($ttotal_su - $pagenum);
+		if($end_num < 0){
+		$end_num = 0;
+		}
+	}
+
+	// 다음페이지
+	} elseif($page > 1){
+
+	$cut_pagenum = $ttotal_su - $pagenum*($page-1);
+	if($cut_pagenum <= 0){
+	$end_num = 0;
+
+	} else {
+		
+	$start_num = $siche_total[$a-1] - $pagenum*($page-1);
+	$end_num =  $first - ($first - ($ttotal_su - $pagenum));
+	if($start_num < 0){$start_num = $start_num - ($start_num*2);}
+
+	if($t >= 1){
+		$start_num = 0;
+		$end_num = $pagenum - $t;
+		}
+	}
+
+	//$page가 0으로 들어 올때
+	} elseif($page == 0){
+	echo "<meta http-equiv=\"refresh\" content=\"0; url=ssearch.php\">";
+	}
+
+	if($end_num > $pagenum){$end_num = $pagenum;}
+
+	//페이지 분할 끝
+		
+	if($first >= 1 && $end_num != 0){
+
+	$siche_query .= " ORDER BY $align $align1 limit $start_num, $end_num";
+	$query = mysql_query($siche_query,$connect);
+	
+	//게시판 제목 출력
+	if($c_bbstitle == 1){
+	$bbs_name	= $searchname[$a];
+	if($c_category == 1){$title_name = $bbstitle_c[$a];}else{$title_name = $bbstitle[$a];}
+	$a_title	= "<a href='zboard.php?id=".$searchname[$a]."' target='".$targets."' class='a_title'>";
+	include $dir."title.php";
+	}
+
+	//본문 출력
+	while($row = mysql_fetch_array($query)){
+	$t++;
+	$no				= $row[no];
+	$name			= $row[name];
+	$hit			= $row[hit];
+	$date			= date("Y-m-d H:i:s",$row[reg_date]);
+	$id				= $row[id];
+	$sitelink1		= $row[sitelink1];
+	$sitelink2		= $row[sitelink2];
+	$file_name1		= $row[file_name1];
+	$file_name2		= $row[file_name2];
+	$s_file_name1	= $row[s_file_name1];
+	$s_file_name2	= $row[s_file_name2];
+	$cmemo			= $row[cmemo];
+	$cname			= $row[cname];
+	$cdate			= date("Y-m-d H:i:s",$row[creg_date]);
+
+	if(!$sitelink1){
+	$hide_sitelink1_start = "<!--";
+	$hide_sitelink1_end = "-->";
+	$a_link1 = "<siche search";
+	}else{
+	$hide_sitelink1_start = "";
+	$hide_sitelink1_end = "";
+	$a_link1 = "<a href='".$sitelink1."' target='_blank' class='a_link1'>";
+	}
+	if(!$sitelink2){
+	$hide_sitelink1_start = "<!--";
+	$hide_sitelink1_end = "-->";
+	$a_link2 = "<siche search";
+	}else{
+	$hide_sitelink1_start = "";
+	$hide_sitelink1_end = "";
+	$a_link2 = "<a href='".$sitelink2."' target='_blank' class='a_link1'>";
+	}
+
+	if($file_name1){
+	$hide_download1_start = "";
+	$hide_download1_end = "";
+	$a_file_link1 = "<a href=\"$file_name1\" target=\"_blank\">";
+	if(!@filesize($file_name1)){
+	$hide_download1_start = "<!--";
+	$hide_download1_end = "-->";
+	$a_file_link1 = "<siche search";
+	} else {
+	$file_size1 = filesize($file_name1)/ 1000;
+	$file_size1 = round($file_size1,1);
+	$file_size1 = $file_size1." KB";
+	$file_name1 = $s_file_name1;
+	}
+	} else {
+	$hide_download1_start = "<!--";
+	$hide_download1_end = "-->";
+	$a_file_link1 = "<siche search";
+	}
+
+	if($file_name2){
+	$hide_download2_start = "";
+	$hide_download2_end = "";
+	$a_file_link2 = "<a href=\"$file_name2\" target=\"_blank\">";
+	if(!@filesize($file_name2)){
+	$hide_download2_start = "<!--";
+	$hide_download2_end = "-->";
+	$a_file_link2 = "<siche search";
+	} else {
+	$file_size2 = filesize($file_name2)/ 1000;
+	$file_size2 = round($file_size2,1);
+	$file_size2 = $file_size2." KB";
+	$file_name2 = $s_file_name2;
+	}
+	} else {
+	$hide_download2_start = "<!--";
+	$hide_download2_end = "-->";
+	$a_file_link2 = "<siche search";
+	}
+	
+	if($cut_length1 == 0){
+	$subject = $row[subject];
+	} else {
+	$subject = cut_str($row[subject],$cut_length1);
+	}
+	if($cut_length2 == 0){
+	$memo = strip_tags($row[memo]);
+	if($cmemo){$cmemo = strip_tags($row[cmemo]);}
+	} else {
+	$memo = strip_tags(stripslashes($row[memo]));
+	$memo = trim($memo);
+	$memo = str_replace("&nbsp;","",$memo);
+	$memo = str_replace(" &nbsp; ","",$memo);
+	$memo = str_replace("  &nbsp;","",$memo);
+	$memo = str_replace("&nbsp;  ","",$memo);
+	$memo = cut_str($memo,$cut_length2);
+	if($cmemo){
+	$cmemo = strip_tags(stripslashes($row[cmemo]));
+	$cmemo = trim($cmemo);
+	$cmemo = str_replace("&nbsp;","",$cmemo);
+	$cmemo = str_replace(" &nbsp; ","",$cmemo);
+	$cmemo = str_replace("  &nbsp;","",$cmemo);
+	$cmemo = str_replace("&nbsp;  ","",$cmemo);
+	$cmemo = cut_str($cmemo,$cut_length2);}
+	}
+
+	$a_blank		= "<a href='view.php?id=".$id."&no=".$no."' target='_blank' class='a_black'>";
+	$a_self			= "<a href='view.php?id=".$id."&no=".$no."' target='_self' class='a_self'>";
+	$a_subject		= "<a href='view.php?id=".$id."&no=".$no."' target='".$targets."' class='a_subject'>";
+		
+	for($q=0;$q<$search_count;$q++){
+	if($sn == 1){$name = str_replace($ssearch[$q],$searchpoint1.$ssearch[$q].$searchpoint2,$name);}
+	if($ss == 1){$subject = str_replace($ssearch[$q],$searchpoint1.$ssearch[$q].$searchpoint2,$subject);}
+	if($sm == 1){$memo = str_replace($ssearch[$q],$searchpoint1.$ssearch[$q].$searchpoint2,$memo);}
+	if($sc == 1){$cmemo = str_replace($ssearch[$q],$searchpoint1.$ssearch[$q].$searchpoint2,$cmemo);}
+	}
+
+	if($cname){
+	include $dir."cmain.php";
+	} else {
+	include $dir."main.php";
+	}
+	}
+	}
+	}		
+		
+	$totalpage	= ceil($ttotal_su/$pagenum);
+	$pagegroup	= ceil($page/$pagegroupnum);
+	$pagestart	= ($pagegroup-1)*$pagegroupnum+1;
+	$pageend	= $pagestart+$pagegroupnum;
+
+	$nextgroup	= $pagegroup + 1;
+	$prevgroup	= $pagegroup - 1;
+
+	$nextstart	= (($nextgroup-1)*$pagegroupnum)+1;
+	$prevstart	= (($prevgroup-1)*$pagegroupnum)+1;
+
+	
+
+	//prev표시
+	if($pagegroup != 1){
+	$a_prev_page = "<a href='$PHP_SELF?sno=$sno&siche=search&page=$prevstart&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=$category' class='prevs'>";
+	$print_page .= "<a href='$PHP_SELF?sno=$sno&siche=search&page=1&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=$category' class='list_num'>[1]</a>..";
+	} else {
+	$a_prev_page = "<siche search";
+	}
+
+	//페이지표시
+	for($i=$pagestart;$i<$pageend;$i++){
+	$o = $i;
+	if($i > $totalpage){break;}
+	if($page == $o){$o = str_replace($page,$pagenumpoint1.$page.$pagenumpoint2,$o);}
+	$print_page .= "<a href='$PHP_SELF?sno=$sno&siche=search&page=$i&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=$category' class='list_num'>[".$o."]</a> ";
+	}
+
+	//next표시
+	if($totalpage >= $nextstart){
+	$a_next_page = "<a href='$PHP_SELF?sno=$sno&siche=search&page=$nextstart&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=$category' class='nexts'>";
+	$print_page .= "..<a href='$PHP_SELF?sno=$sno&siche=search&page=$totalpage&sn=$sn&ss=$ss&sm=$sm&sc=$sc&oga=$oga&search=$search&align=$align&align1=$align1&category=$category' class='list_num'>[".$totalpage."]</a> ";
+	} else {
+	$a_next_page = "<siche search";
+	}
+
+	if($ttotal_su == 0){include $dir."nosearch.php";$nosearchs = "<!--";$nosearche = "-->";}
+	$etime=(double)microtime()+time();
+	$siche_time =$etime-$stime;
+	include $dir."foot.php";
+	echo "<div style=\"width:$width;line-height:160%\" align=right><font size=1 face=tahoma>$copyright</font></div>";
+	if($f_comment){echo $f_comment;}
+	if($downfile){include $downfile;}
+	mysql_close($connect);
+	} elseif($siche == "test") {
+	echo $siche_search_ver;
+	} elseif($siche_search_ver != "Siche search v.0.5" || !$siche_license) {
+	} else {
+	// ssearch.php로 바로 왔을때
+	$total_su = 1;
+	$nosearchs = "<!--";
+	$nosearche = "-->";
+	$a_prev_page = "<siche search";
+	$a_next_page = "<siche search";
+
+	$oga = "or";
+
+	if($upfile){include $upfile;}
+	if($h_comment){echo $h_comment;}
+	// echo "<link href=\"".$dir."style.css\" rel=\"stylesheet\" type=\"text/css\">";
+	echo "<div style='position:absolute; z-index:0; width:100%'>";
+	include $dir."head.php";
+	include $dir."nosearch.php";
+	// include $dir."foot.php";
+	
+	echo "</div>";
+	//echo "<div style=\"width:$width;line-height:160%\" align=right><font size=1 face=tahoma>$copyright</font></div>";
+	if($f_comment){echo $f_comment;}
+	if($downfile){include $downfile;}
+	mysql_close($connect);
+	}
+?>
+</div>
+</body>
+
+<script type="text/javascript">
+
+jQuery(window).load(function() {
+
+    $("#nav > li > a").mouseover(function (e) { // binding onclick
+        if ($(this).parent().hasClass('selected')) {
+            $("#nav .selected div div").slideUp(1); // hiding popups
+            $("#nav .selected").removeClass("selected");
+        } else {
+            $("#nav .selected div div").slideUp(1); // hiding popups
+            $("#nav .selected").removeClass("selected");
+
+            if ($(this).next(".nav-submenu").length) {
+                $(this).parent().addClass("selected"); // display popup
+                $(this).next(".nav-submenu").children().slideDown(0);
+            }
+        }
+      //  e.stopPropagation();
+    }); 
+
+ 
+
+});
+</script>
+
+
+<script>
+		
+
+$(function() {
+    var count = $('#layer1 li').length;
+    var height = $('#layer1 li').height();
+
+    function step(index) {
+        $('#layer1 ol').delay(2000).animate({
+            top: -height * index,
+        }, 500, function() {
+            step((index + 1) % count);
+        });
+    }
+
+    step(1);
+});
+</script>
+
+
+</html>

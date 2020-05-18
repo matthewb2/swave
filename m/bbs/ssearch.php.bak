@@ -1,0 +1,226 @@
+<? 
+	include "_head.php";
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>과학전문검색 에스웨이브</title>
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0" /> 
+  <link rel="stylesheet" media="all" href="style.css" type="text/css">
+  <script src="js/jquery.min.js"></script>
+</head>
+<body>
+<?
+
+include "header.php";
+?>
+
+<body>
+<!--
+	Author Details
+	==============
+
+	Author: Mobifreaks
+	Author URL: http://mobifreaks.com
+
+	Attribution( is must on every page, where this work is used. should be visible to naked eye and Search engine bot[ means should not use noindex, nofollow relations ]):
+
+	// a healty attribution looks like following
+	<a href="http://mobifreaks.com" target="_blank">Design by Mobifreaks</a>
+
+	License: Creative Commons Attribution 3.0 Unported
+	License URL: http://creativecommons.org/licenses/by/3.0/
+
+	if any regards of infringement, may lead to lawsuit under Digital Millennium Copyright Act (DMCA)
+
+	For Attribution removal request. please consider contacting us through http://mobifreaks.com/feedback/ or mail us at support[at]mobifreaks.com
+ -->
+ <?
+	$stime=(double)microtime()+time();
+
+	function error_MSG($error_MSG){
+		global $bgcolor;
+		unset($bgcolor);
+		echo "
+		<SCRIPT LANGUAGE=JavaScript>
+		alert ('$error_MSG');
+		history.go(-1);
+		</SCRIPT>
+		";
+
+		exit;
+	}
+	
+
+	
+	$search = $_GET[search];
+	$keyword = $search;
+	
+	//include $dir."head.php";
+		
+	//$query = "select * from zetyx_board_doc where name like '%$search%'";
+
+	$show_page_num=10;
+	
+	$query = "select * from zetyx_board_doc where subject like '%$search%' or memo like '%$search%' ";
+	
+	$result = mysql_query($query);
+	
+	
+
+	
+	echo "<table width='100%'>";
+	while($row = mysql_fetch_array($result)) {
+	   //echo $row[subject];
+	   $subject = $row[subject];
+	   $memo = $row[memo];
+	   $id = "doc";
+	   
+	   ?><tr width='100%'>
+		<td style="height:50px; width:100%; font-style:left; font-size:10pt; border: 1px solid #cccccc; padding:5px; cursor:pointer" 
+		onclick="window.location='view.php?id=<?=$id?>&no=<?=$row[no]?>';"><?=$subject?></td>
+		</tr>
+	<?	}
+	echo "</table>";
+	
+?>
+
+
+
+<?php
+if($list_empty == true) {
+	echo "<tr><td align=center valign=middle height=100 colspan=6 bgcolor=#fefdfc style='font-size:9pt; color:#555555'>등록된 게시물 또는 검색결과가 없습니다.</td></tr>";
+}
+?>
+</table>
+</form>
+<?
+/***************************************************************************
+* 네이버 스타일 페이지 리스트
+**************************************************************************/
+//$print_page2="";
+//$show_page_num=$setup[page_num]; // 한번에 보일 페이지 갯수
+
+
+$start_page=(int)(($page-1)/$show_page_num)*$show_page_num;
+ $dir = "/bbs/skin/zb5_style";
+//$start_page = 1;
+$PHP_SELF = "zboard.php";
+
+$i=1;
+
+$total_page = 20;
+
+$a_prev_page2 = "<table cellspacing=0 cellpadding=0 border=0 align=center><tr>";
+$a_next_page2 = "</tr></table>";
+
+if($page>$show_page_num) {
+$prev_page=$start_page;
+$a_prev_page2.="<td style='padding:3 2 0 3''><a class='link_page' href='$PHP_SELF?id=$id&page=1&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[처음으로]</a></td>";
+$print_page2.="<td style='padding:3 2 0 3'' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$prev_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[이전]</a></td>";
+$prev_page_exists = true;
+}
+
+while($i+$start_page<=$total_page && $i<=$show_page_num) {
+$move_page=$i+$start_page;
+if($page==$move_page) 
+	$print_page2.="<td style='padding:3 5 0 6'><font style='font-family: 돋움; font-size:8pt; color:#9A9893;'>
+			<b>$move_page</b></font></td><td width=1 heght='10px'><img src='$dir/images/page_img.gif' /></td>";
+else $print_page2.="<td style='padding:3 5 0 6'><a class='link_page' href='$PHP_SELF?id=$id&page=$move_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>$move_page</a></td><td width=1 heght='10px'><img src='$dir/images/page_img.gif' /></td>";
+$i++;
+}
+
+if($total_page>$move_page) {
+$next_page=$move_page+1;
+$a_next_page2="<td style='padding:3 2 0 3' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$total_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[마지막]</a></td></tr></table>";
+$print_page2.="<td style='padding:3 2 0 6' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$next_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[다음]</a></td>";
+$next_page_exists = true;
+}
+?>
+
+<table>
+<tr>
+<td>
+<?=$a_prev_page2?><?=$print_page2?><?=$a_next_page2?>
+</td>
+</tr>
+</table>
+
+
+<table>
+<tr>
+<td>
+&nbsp;
+</td>
+</tr>
+</table>
+
+
+
+
+<!---------------->
+</div>
+
+
+  <footer>
+    	<p>&copy; SWAVE 2016 Designed by <a href="http://mobifreaks.com" target="_blank">Mobifreaks</a></p>
+    </footer>
+  </div>
+ 
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	 $('.search-box' ).show();
+		   $('.menu' ).hide();   
+
+  
+});
+   window.addEventListener("load",function() {
+	  // Set a timeout...
+	  setTimeout(function(){
+	    // Hide the address bar!
+	    window.scrollTo(0, 1);
+	  }, 0);
+	});
+   $('.search-box,.menu' ).hide();   
+   $('.options li:first-child').click(function(){	
+   		$(this).toggleClass('active'); 	
+   		$('.search-box').toggle();        			
+   		$('.menu').hide();  		
+   		$('.options li:last-child').removeClass('active'); 
+   });
+   $('.options li:last-child').click(function(){
+   		$(this).toggleClass('active');      			
+   		$('.menu').toggle();  		
+   		$('.search-box').hide(); 
+   		$('.options li:first-child').removeClass('active'); 		
+   });
+   $('.content').click(function(){
+   		$('.search-box,.menu' ).hide();   
+   		$('.options li:last-child, .options li:first-child').removeClass('active');
+   });
+</script>
+<!--
+	Author Details
+	==============
+
+	Author: Mobifreaks
+	Author URL: http://mobifreaks.com
+
+	Attribution( is must on every page, where this work is used. should be visible to naked eye and Search engine bot[ means should not use noindex, nofollow relations ]):
+
+	// a healty attribution looks like following
+	<a href="http://mobifreaks.com" target="_blank">Design by Mobifreaks</a>
+
+	License: Creative Commons Attribution 3.0 Unported
+	License URL: http://creativecommons.org/licenses/by/3.0/
+
+	if any regards of infringement, may lead to lawsuit under Digital Millennium Copyright Act (DMCA)
+
+	For Attribution removal request. please consider contacting us through http://mobifreaks.com/feedback/ or mail us at support[at]mobifreaks.com
+ -->
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Line Chart Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+   <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.4.min.js"></script>
+  <script language="JavaScript">
+  
+  function prettyPrint() {
+	var col0 = $( "#myselect option:selected" ).val();
+  //alert(col0);
+   var cars = $('#myTextArea').val().split(/\n|\r/);
+    
+   var col1 = [];
+   var col2 = [];
+   
+   for (i = 0; i < cars.length; i++) {
+		if (/\S/.test(cars[i])) {
+			var fruits = cars[i].split(',');
+			//fruits.toString();
+			//alert(cars[0].split(','));
+			
+			col1.push(fruits[0]);
+			col2.push(fruits[1]);
+		}
+	
+ 
+	}
+	//alert(col2);
+	
+	sendjson(col0, col1, col2);
+   
+   
+}
+
+function sendjson(col0, col1, col2) {
+   
+  
+$.post("jsontest2.php",
+					{
+						stock: col0,
+						no: col1,
+						price: col2,
+					//	bad: bad
+					},
+					function(){
+						alert("공감되었습니다");
+					});
+
+}
+
+
+function Print() {
+   
+   var colume1 = ["0305","0306","0307","0308"];
+   var colume2 = ["15455","15475","15555","15355"];
+$.post("jsontest.php",
+					{
+						no: colume1,
+						price: colume2,
+					//	bad: bad
+					},
+					function(){
+						alert("공감되었습니다");
+					});
+
+}
+
+function getFile() {
+	var stock = $( "#myselect option:selected" ).val();
+	$.getJSON("newsdata2.json", function(result){
+	   var Alltext = "";
+		 $.each(result, function(i, field){
+			if (i == stock){
+				$.each(field, function(j, f){
+					  Alltext += j+","+f+"\n";
+				});
+			}
+		 });
+		   document.getElementById("myTextArea").value = Alltext;
+		
+		});
+}
+
+function getPrint() {
+	var stock2 = $( "#myselect option:selected" ).val();
+	$.getJSON("newsdata2.json", function(result){
+		var af =[];
+		var ai =[];
+        $.each(result, function(i, field){
+          
+			 if (i == stock2){
+				$.each(field, function(j, f){
+					  af.push(f);
+						ai.push(j);
+				});
+			 // af.push(field);
+			 //ai.push(i);
+			 }
+			
+        });
+	 displayLine2(ai,af);	
+    });
+	
+	
+	
+	function displayLine2(ai, res) {
+    var data = {
+        labels: ai,
+        datasets: [
+            {
+                label: "Prime and Fibonacci",
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(220,220,220,1)",
+                pointColor: "rgba(220,220,220,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(220,220,220,1)",
+                data: res
+            }
+        ]
+    };
+    var ctx = document.getElementById("lineChart").getContext("2d");
+    var options = {  //Boolean - Whether the line is curved between points
+    bezierCurve : false};
+    var lineChart = new Chart(ctx).Line(data, options);
+  }
+
+}
+  </script>
+   
+</head>
+<body>
+
+ <select  id="myselect">
+  <option value="kospi">코스피</option>
+  <option value="kosdaq">코스닥</option>
+  <option value="mercedes">Mercedes</option>
+  <option value="audi">Audi</option>
+</select> 
+<br>
+<textarea id="myTextArea" cols=50 rows=10></textarea>
+<br>
+<button onclick="prettyPrint()">send to json</button>
+<button onclick="getFile()">get from file</button>
+<button onclick="Print()">transfer test</button>
+<button onclick="getPrint()">show graph</button>
+
+<p id="demo"></p>
+ <div class="box">
+    <canvas id="lineChart" height="400" width="600"></canvas>
+</div>
+</body>
+</html>

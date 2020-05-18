@@ -1,0 +1,23 @@
+<!DOCTYPE>
+<html lang="en-GB">
+<head>
+   <script src="https://code.jquery.com/jquery-1.4.4.min.js"></script>
+<meta charset="utf8">
+</head>
+
+<body>
+<div id="span-holder">eeeee</div>
+
+<script>
+$('#span-holder').append('<div class="clickme">Another target</div>');
+
+
+$('.clickme').bind('click', function() {
+  // Bound handler called.
+  alert('ddd');
+});
+
+</script>
+
+</body>
+</html>

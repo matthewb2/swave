@@ -1,0 +1,152 @@
+<?php
+if($list_empty == true) {
+	echo "<tr><td align=center valign=middle height=100 colspan=6 bgcolor=#fefdfc style='font-size:9pt; color:#555555'>등록된 게시물 또는 검색결과가 없습니다.</td></tr>";
+}
+?>
+</table>
+</form>
+<?
+/***************************************************************************
+* 네이버 스타일 페이지 리스트
+**************************************************************************/
+$print_page2="";
+$show_page_num=$setup[page_num]; // 한번에 보일 페이지 갯수
+$start_page=(int)(($page-1)/$show_page_num)*$show_page_num;
+$i=1;
+
+$a_prev_page2 = "<table cellspacing=0 cellpadding=0 border=0 align=center><tr>";
+$a_next_page2 = "</tr></table>";
+
+if($page>$show_page_num) {
+$prev_page=$start_page;
+$a_prev_page2.="<td style='padding:3 2 0 3''><a class='link_page' href='$PHP_SELF?id=$id&page=1&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[처음으로]</a></td>";
+$print_page2.="<td style='padding:3 2 0 3'' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$prev_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[이전]</a></td>";
+$prev_page_exists = true;
+}
+
+while($i+$start_page<=$total_page&&$i<=$show_page_num) {
+$move_page=$i+$start_page;
+if($page==$move_page) $print_page2.="<td style='padding:3 5 0 6'><font style='font-family: 돋움; font-size:8pt; color:#9A9893;'><b>$move_page</b></font></td><td width=1 heght='10px'><img src='$dir/images/page_img.gif' /></td>";
+else $print_page2.="<td style='padding:3 5 0 6'><a class='link_page' href='$PHP_SELF?id=$id&page=$move_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>$move_page</a></td><td width=1 heght='10px'><img src='$dir/images/page_img.gif' /></td>";
+$i++;
+}
+
+if($total_page>$move_page) {
+$next_page=$move_page+1;
+$a_next_page2="<td style='padding:3 2 0 3' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$total_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[마지막]</a></td></tr></table>";
+$print_page2.="<td style='padding:3 2 0 6' nowrap><a class='link_page' href='$PHP_SELF?id=$id&page=$next_page&select_arrange=$select_arrange&desc=$desc&category=$category&sn=$sn&ss=$ss&sc=$sc&keyword=$keyword&tkw=$tkw&within=$within&tsc=$tsc&tsn=$tsn&tss=$tss&sn1=$sn1&divpage=$divpage'>[다음]</a></td>";
+$next_page_exists = true;
+}
+?>
+
+<script language="javascript" type="text/javascript">
+	function check_search_form (formObj){
+		if (formObj.elements['keyword'].value.length < 1)
+		{
+			alert('검색어를 입력 하십시오');
+			formObj.elements['keyword'].focus();
+			return false;
+		}
+		if (formObj.elements['keyword'].value.length < 2)
+		{
+			alert('검색어를 2자 이상 입력 하십시오.');
+			formObj.elements['keyword'].focus();
+			formObj.elements['keyword'].select();
+			return false;
+		}
+
+		// 걸러낼 특수문자 풀세트 var illegalChars = /\<|\/|\>|\"|\'|\%|\;|\(|\)|\&|\+|\-|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\_|\-|\+|\=|\[|\]|\{|\}|\\|\||\;|\:|\/|\?|\.|\,|\~|\`/;
+		//위의 풀세트를 아래에 다 적용하시거나, 아니면 아래처럼 몇가지는 허용하시고 적용하실수 있습니다.
+		//아래 처럼 사용하시길 권장!
+
+		var illegalChars = /\<|\/|\>|\"|\'|\%|\;|\(|\)|\&|\#|\$|\%|\&|\*|\=|\{|\}|\\|\||\;|\:|\/|\?|\~|\`/;
+		if (illegalChars.test(formObj.elements['keyword'].value)) {
+			alert('검색어에는 특수기호를 사용하실수 없습니다.');
+			formObj.elements['keyword'].focus();
+			formObj.elements['keyword'].select();
+			return false;   
+		}
+
+		if (formObj.sn.value=="off" && formObj.sc.value=="off" && formObj.ss.value=="off")
+		{
+			alert('검색 구분을 선택 하십시오.');
+			return false;
+		}
+		return true;
+	}
+</script>
+
+<form method="get" name="search" action="<?=$PHP_SELF?>" onsubmit="return check_search_form(this)" />
+<input type="hidden" name="id" value="<?=$id?>" />
+<input type="hidden" name="select_arrange" value="<?=$select_arrange?>" />
+<input type="hidden" name="desc" value="<?=$desc?>" />
+<input type="hidden" name="page_num" value="<?=$page_num?>" />
+<input type="hidden" name="selected" />
+<input type="hidden" name="exec" />
+<input type="hidden" name="sn" value="<?=$sn?>" />
+<input type="hidden" name="ss" value="<?=$ss?>" />
+<input type="hidden" name="sc" value="<?=$sc?>" />
+<input type="hidden" name="category" value="<?=$category?>" />
+
+<table width="<?=$width?>" cellSpacing="0" cellpadding="0" border="0" style="table-layout: fixed">
+
+<tr height="5px"><td colspan="5"></td></tr>
+<colgroup><col width="100px"><col width="6px"><col><col width="6px"><col width="75px"></colgroup>
+<tr>
+<td><? if($is_admin) {?><input type="checkbox" id='checkAll' onclick='check_all();' /><?}?>
+<?=$a_list?><img src="<?=$dir?>/images/btn_viewall.gif"" alt="목록보기" /></a></td>
+<td><img src="<?=$dir?>/images/bar_head_l.gif" /></td>
+<td class=" foot_page_list"><?=$a_prev_page2?><?=$print_page2?><?=$a_next_page2?></td>
+<td><img src="<?=$dir?>/images/bar_head_r.gif" /></td>
+<td align="right"><?=$a_write?><img src="<?=$dir?>/images/btn_post.gif" alt="새글쓰기" /></a></td>
+</tr>
+
+
+<? if($is_admin) {?>
+<tr height="5px"><td colspan="5" align="center"></td></tr>
+<tr>
+<td><?=$a_delete_all?><img src="<?=$dir?>/images/btn_cart_delete.gif"" alt="선택관리" /></a></td>
+<td><img src="<?=$dir?>/images/bar_head_l.gif" /></td>
+<td class=" foot_page_list">당신은 운영자 입니다</td>
+<td><img src="<?=$dir?>/images/bar_head_r.gif" /></td>
+<td align="right"><?=$a_setup?><img src="<?=$dir?>/images/btn_list_admin.gif" alt="게시판설정" /></a></td>
+</tr>
+<? } ?>
+<tr height="20px"><td colspan="5" align="center"></td></tr>
+
+
+<tr height="25px">
+<td align="left"></td>
+<td colspan="3" class="foot_chack">
+<a href="javascript:OnOff('ss')" onfocus="blur()"><img src="<?=$dir?>/subject_<?=$ss?>.gif" border="0" name="ss" style="margin-right: 8px;
+" align="absMiddle" /></a><a href="javascript:OnOff('sc')" onfocus="blur()"><img src="<?=$dir?>/content_<?=$sc?>.gif" name="sc" style="margin-right: 8px;
+" align="absMiddle" /></a><a href="javascript:OnOff('sn')" onfocus="blur()"><img src="<?=$dir?>/name_<?=$sn?>.gif" name="sn" style="margin-right: 8px;
+" align="absMiddle" /></a></td>
+<td align="right"></td>
+</tr>
+
+<tr>
+<td align="left"></td>
+<td colspan="3" class="foot_chack" valign=middle><input name="keyword" value="<?=$keyword?>" class="input001" /><input type="image" src="<?=$dir?>/images/btn_search.gif" style="margin-left: 3px;" align="absMiddle" /><img src="<?=$dir?>/images/btn_search_cancel.gif" onclick=location.href="zboard.php?id=<?=$id?>" style="margin-left: 3px;cursor:pointer" align="absMiddle" /></td>
+<td align="right"></td>
+</tr>
+</table>
+</form>
+<script type="text/javascript">
+
+$(document).ready(function() {
+    $('#checkAll').click(function(event) {  //on click
+        if(this.checked) { // check select status
+            $('.check').each(function() { //loop through each checkbox
+                this.checked = true;  //select all checkboxes with class "checkbox1"              
+            });
+        }else{
+            $('.check').each(function() { //loop through each checkbox
+                this.checked = false; //deselect all checkboxes with class "checkbox1"                      
+            });        
+        }
+    });
+   
+});
+
+</script>

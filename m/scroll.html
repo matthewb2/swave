@@ -1,0 +1,111 @@
+
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr" />
+<meta http-equiv="X-UA-Compatible" content="IE=7">
+  <meta name="viewport" content="width=device-width, 
+		initial-scale=1.0, maximum-scale=1.0,
+		user-scalable=no" /> 
+<link href="/bbs/siche_search_skin/siche_search_0_5/style.css" type="text/css" rel="stylesheet">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="/resources/demos/style.css">
+ 
+ 
+ <style>
+ .container{
+ width:550px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  
+ background-color:#eeeeee;
+ 
+ -webkit-overflow-scrolling: touch;
+ 
+ }
+ 
+ .scrolling-wrapper {
+ width:1100px;
+margin-left:100px;
+}
+
+
+
+.card {
+    display: inline-block;
+  
+  border: 1px solid white;
+  width: 200px;
+  height: 230px;
+  background: orange;
+  }
+
+  
+  
+
+</style>
+ 
+ </head>
+
+ <body>
+<div class="container" id="scrollquestion">
+  <div class="scrolling-wrapper" id="inner">
+			<div class="card"><h2>Card</h2></div>
+			<div class="card"><h2>Card</h2></div>
+			<div class="card"><h2>Card</h2></div>
+			<div class="card"><h2>Card</h2></div>
+			<div class="card"><h2>Card</h2></div>
+    </div>
+ </div>
+</body>
+
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+//alert("ddd");		
+ document.getElementById('scrollquestion').addEventListener("touchstart", touchHandler, false);
+ document.getElementById('scrollquestion').addEventListener("touchmove", touchHandler, false);
+ document.getElementById('scrollquestion').addEventListener("touchend", touchHandler, false);
+ //alert("ddd");
+	$('.container').scrollLeft(100);// initial scrollbar position
+});
+
+function touchHandler(e){
+	var start = 0;
+	var end = 650;
+	var pad = 100;
+	 var width = $('#scrollquestion').outerWidth();  //650
+	 var scrollWidth = $('#scrollquestion')[0].scrollWidth; //1200
+	 //alert(scrollWidth);
+	if (e.type == "touchstart"){
+		// alert( $('.container').scrollLeft());
+		start = $('.container').scrollLeft()
+	
+	} else if( e.type == "touchend"){
+	
+		//alert($('.container').scrollLeft());
+		scrollLeft = $('.container').scrollLeft();
+		alert(scrollLeft);
+		//bouncediv("right");
+		//alert(parseInt(end));
+		if (scrollLeft < start+pad){
+				//bouncediv("left");
+			$('.container').animate({scrollLeft:start+pad},'50');
+			
+		
+		
+		
+		} else if (scrollLeft > (end-pad)){
+		//$('.container').scrollLeft(550);
+			$('.container').animate({scrollLeft:end-pad},'50');
+        
+		}
+	}
+}
+
+
+ </script>
+ 
+</html>

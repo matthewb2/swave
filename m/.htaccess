@@ -1,0 +1,11 @@
+
+RewriteEngine On
+
+RewriteBase /m/
+
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^view/([a-z]+)/([0-9]+)?$ /bbs/view.php?id=$1&no=$2
+RewriteRule ^zboard/([a-z]+)/([0-9]+)?$ /bbs/zboard.php?id=$1&page=$2
+RewriteRule ^zboard/([a-z]+)/([0-9]+)/([0-9]+)?$ /bbs/zboard.php?id=$1&page=$2&category=$3
+
